@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<script src="origin.js"></script>
+		<script src="semantic_parser.js"></script>
+		<script>
+			function Do(){
+				parser.parse(document.getElementById("m").value);
+				eval(program);
+				executionstack = new DataStructures.stack();
+				executionstack.push({});
+				aux_type = "";
+				list = [];
+			}
+		</script>
+	</head>
+
+	<body>
+
+		<button type="button" onclick="Do()">Click Me!</button>
+
+		<textarea id="m" rows="100" cols="100">
+
+		</textarea>
+
+	</body>
+</html>
