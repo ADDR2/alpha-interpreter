@@ -1,0 +1,1 @@
+module.exports = ({ left, right }, eval) => eval(left) || eval(right);

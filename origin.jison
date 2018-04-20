@@ -119,20 +119,19 @@
 START   : CHUNK { program = $1;}
         ;
 
-CHUNK   : BLOCK LASTSTAT { $$ = new AstNode('Chunk', {left : $1, right :$2, line : yylineno}); }
+CHUNK   : BLOCK LASTSTAT { $$ = {type: 'Chunk', left : $1, right :$2, line : yylineno}; }
         ;
 
-BLOCK   : BLOCK STAT { $$ = new AstNode('Block', {left : $1, right :$2, line : yylineno}); }
-        | { $$ = new AstNode('Empty'); }
+BLOCK   : BLOCK STAT { $$ = {type: 'Block', left : $1, right :$2, line : yylineno}; }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 LASTSTAT    : return EXP { $$ = new AstNode('Return', {left: $2, line : yylineno}); }
             | EOF {;}
-            | { $$ = new AstNode('Empty'); }
+            | { $$ = {type: 'Empty'}; }
             ;
             
 STAT    : CLASS '=' EXP SCOLON { $$ = new AstNode('Asig', {left : $1, right :$3, ref: false, line : yylineno}); }
-        | dref CLASS '=' EXP SCOLON { $$ = new AstNode('Asig', {left : $2, right :$4, ref: true, line : yylineno}); }
         | DEC SCOLON {$$ = new AstNode('Declaration', {left : $1, right :$2, line : yylineno});}
         | NEWTYPE SCOLON {$$ = new AstNode('NewType', {left : $1, line : yylineno});}
         | array VAR of POINT TOV DIM SCOLON { $$ = new AstNode('Array', {name : $2, tov : $5, left :$6, line : yylineno}); } 
@@ -147,7 +146,7 @@ STAT    : CLASS '=' EXP SCOLON { $$ = new AstNode('Asig', {left : $1, right :$3,
         | for CLASS '=' EXP to EXP IVN do CHUNK end {$$ = new AstNode('For', {id : $2, init :$4, end :$6, inc : $7, left : $9, line : yylineno});}
         | foreach VAR in VAR CHUNK end {$$ = new AstNode('Foreach', {element: $2, array: $4, left: $5, line : yylineno});}
         | class var TIPO BODY {;}
-        | comment { $$ = new AstNode('Empty'); }
+        | comment { $$ = {type: 'Empty'}; }
         ;
 
 TOV     : type {$$ = yytext;}
@@ -192,7 +191,7 @@ TYPE    : virtual {;}
         ;
 
 COND    : EXP ':' CHUNK end COND {$$ = new AstNode('Cond', {condition : $1, left :$3, right :$5, line : yylineno});}
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 NEWTYPE : newt POINT type var {$$ = new AstNode( 'VarType', {name : $4, left :$3, line : yylineno}); }
@@ -205,13 +204,13 @@ POINT   : '*' { $$ = true;}
         ;
 
 LIST    : TOV POINT VAR LIST { $$ = new AstNode('List', {left : $1, right :$3, next : $4, point: $2, line : yylineno}); }
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 
 DIM     : '[' IOV '.' '.' IOV ']' NDIM {$$ = new AstNode('Dim', {init : $2, end :$5, left :$7, line : yylineno});}
         | '[' ']' '=' '{' LTYPES '}' {$$ = new AstNode('Init', {left : $5, line : yylineno});}
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 IOV     : int {$$ = new AstNode('INT', {value : Number(yytext)});}
@@ -239,11 +238,11 @@ TYPES   : type {$$ = yytext;}
         ;
 
 ASIG    : '=' EXP { $$ = new AstNode( 'Asignation', {left : $2, line : yylineno}); }
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 CONTINUE: ',' POINT VAR ASIG CONTINUE {$$ = new AstNode( 'Next Declaration', {left : $4, right :$5, name: $3, point: $2, line : yylineno}); }
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;
 
 SCOLON  : ';' {;}
@@ -318,7 +317,7 @@ BACKTRACK   : '(' EXP ')' { $$ = new AstNode('Exp', {left : $2, line : yylineno}
             | false { $$ = new AstNode('BOOL', {value : yytext}); }
             | string { $$ = new AstNode('STRING', {value : yytext}); }
             | float { $$ = new AstNode('REAL', {value : Number(yytext)}); }
-			| char { $$ = new AstNode('CHAR', {value : yytext}); }
+            | char { $$ = new AstNode('CHAR', {value : yytext}); }
             | int { $$ = new AstNode('INT', {value : Number(yytext)}); }
             | '-' int { $$ = new AstNode('INT', {value : -Number(yytext)}); }
             | '+' int { $$ = new AstNode('INT', {value : Number(yytext)}); }
@@ -368,10 +367,10 @@ ARRAY   : '[' EXP ']' ARRAY { $$ = new AstNode('ARR', {index : $2, left : $4, li
 
 ELSE    : elseif EXP then CHUNK {$$ = new AstNode('Elseif', {condition : $2, left : $4, line : yylineno});}
         | else CHUNK {$$ = new AstNode('Else', {left : $2, line : yylineno});}
-        | {$$ = new AstNode('Empty');}
+        | {$$ = {type: 'Empty'};}
         ;
 
-FUNCBODY    : '(' ')' { $$ = new AstNode('Empty'); }
+FUNCBODY    : '(' ')' { $$ = {type: 'Empty'}; }
             |'(' PARLIST ')' {$$ = new AstNode('Params', {left : $2, line : yylineno});}
             ;
 
@@ -382,5 +381,5 @@ PARLIST : type var NEXT {$$ = new AstNode('TypeParam', {next : $3, left : $1, ri
         ;
 
 NEXT    : ',' PARLIST {$$ = new AstNode('Next', {left : $2, line : yylineno});}
-        | { $$ = new AstNode('Empty'); }
+        | { $$ = {type: 'Empty'}; }
         ;

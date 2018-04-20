@@ -1,5 +1,5 @@
-const { AST, parser } = require('./origin.js');
-const { eval, Emitter } = require('./semantic_parser');
+const { AST, parser } = require('./Processors/Parser');
+const { eval, Emitter } = require('./Processors/Semantic');
 
 const defaultLogger = (type, message, timeStamp, code) => {
     console.log(`${type}: ${message} - [${timeStamp}] - (${code})`);
@@ -21,6 +21,6 @@ class AlphaInterpreter {
     }
 }
 
-new AlphaInterpreter().run("String a = \"algo\";");
+new AlphaInterpreter().run("Integer a = 1 + 5 Integer b = a + 0.5");
 
 module.exports = AlphaInterpreter;
