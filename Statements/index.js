@@ -7,7 +7,7 @@ fs.readdir(folder, (err, files) => {
     if(err) throw new Error(err);
 
     for(file of files) {
-        Statements[file] = require(`./${file}`);
+        Statements[file.replace('.js', '')] = require(`./${file}`);
     }
 });
 

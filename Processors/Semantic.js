@@ -250,12 +250,12 @@ class SemanticProcessor {
         try {
             return this.nodeTypes[astNode.type](
                 astNode,
-                (node = { type: 'Empty' }) => this.eval(node),
+                this.eval.bind(this),
                 {
                     Stack: this.executionStack,
-                    FindScope: (...params) => this.FindScope(...params),
-                    notInCurrentScope: (...params) => this.notInCurrentScope(...params),
-                    getValueAndType: (...params) => this.getValueAndType(...params),
+                    FindScope: this.FindScope.bind(this),
+                    notInCurrentScope: this.notInCurrentScope.bind(this),
+                    getValueAndType: this.getValueAndType.bind(this),
                     Types
                 }
             );
